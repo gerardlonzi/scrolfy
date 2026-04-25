@@ -1,0 +1,102 @@
+{
+  "common": {
+    "cancel": "Annuler",
+    "continue": "Continuer",
+    "save": "Enregistrer",
+    "language": "Langue",
+    "theme": "Thème",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "themeSystem": "Système"
+  },
+  "tabs": {
+    "focus": "Focus",
+    "mastery": "Maîtrise",
+    "settings": "Réglages"
+  },
+  "focus": {
+    "appsTitle": "Applications à surveiller.",
+    "appsSubtitle": "Sélectionnez les apps qui vous distraient le plus.",
+    "freeLimitTitle": "Limite gratuite",
+    "freeLimitBody": "En version gratuite, vous pouvez surveiller 1 seule application (TikTok est réservé au Premium).",
+    "notInstalledTitle": "Application introuvable",
+    "notInstalledBody": "{{name}} ne semble pas installée sur cet appareil (schéma : {{scheme}}).",
+    "customTitle": "Ajouter une app (personnalisée)",
+    "customHint": "Un schéma d’URL (ex. tg://) est obligatoire pour vérifier que l’app est installée.",
+    "customNamePh": "Nom (ex. Messenger)",
+    "customSchemePh": "Schéma (ex. tg://)",
+    "schemeRequiredTitle": "Schéma requis",
+    "schemeRequiredBody": "Indiquez un schéma d’URL pour vérifier l’installation avant d’ajouter l’app.",
+    "customInvalidScheme": "Ce schéma ne répond pas : l’app n’est probablement pas installée.",
+    "duplicateTitle": "Nom déjà utilisé",
+    "duplicateBody": "Vous avez déjà une application nommée « {{name}} ». Choisissez un autre nom pour éviter les doublons.",
+    "add": "Ajouter",
+    "activate": "Activer le bouclier",
+    "accessibilityTitle": "Autorisation Accessibilité",
+    "accessibilityBody": "Pour activer le bouclier sur Android, ouvrez Accessibilité et activez Scrolfy. Cette étape ne se fait qu’une seule fois.",
+    "shieldTitle": "Autorisations système",
+    "shieldBody": "Le blocage réel des apps nécessite Temps d’écran (iOS) ou Accessibilité / contrôle parental (Android). Ouvrez les réglages système pour activer les permissions adaptées à votre appareil.",
+    "openOsSettings": "Ouvrir les réglages",
+    "selectedCount": "Sélectionnées : {{n}} / {{total}}",
+    "premium": "Premium",
+    "free": "Gratuit"
+  },
+  "mastery": {
+    "title": "Votre progression.",
+    "subtitle": "Chaque victoire compte. Vous êtes sur la bonne voie.",
+    "today": "AUJOURD’HUI",
+    "notions": "{{count}} notions maîtrisées aujourd'hui",
+    "cta": "Continuer l’apprentissage",
+    "saved": "{{minutes}} min de scroll transformées en révision.",
+    "streak": "Série de {{days}} jours",
+    "streakHint": "Continuez sur cette lancée pour débloquer le badge « Maître Focus ».",
+    "last": "Dernière maîtrise",
+    "lastBody": "{{title}} — {{score}}% de réussite.",
+    "analysisTitle": "Répartition de votre attention",
+    "analysisStatus": "Analyse en cours…",
+    "analysisBody": "{{answered}} quiz · {{pct}}% réussite · vos cycles d’apprentissage s’optimisent."
+  },
+  "settings": {
+    "title": "Réglages",
+    "subtitle": "Données du profil, langue, thème et bouclier.",
+    "profileSection": "Profil",
+    "editProfile": "Modifier le profilage",
+    "limits": "Limites de scroll",
+    "premium": "Premium",
+    "quizDemo": "Tester une interception (quiz)",
+    "permissions": "Autorisations de blocage",
+    "permissionsHint": "Temps d’écran / Accessibilité — requis pour un blocage réel sur l’appareil."
+  },
+  "splash": {
+    "quote": "Scrolfy — votre futur commence ici.",
+    "loading": "Chargement",
+    "init": "Initialisation"
+  },
+  "onboarding": {
+    "slide1": {
+      "title": "Scrollez intelligemment.",
+      "description": "Chaque minute de scroll est une opportunité perdue. Reprenez le contrôle de votre destin."
+    },
+    "slide2": {
+      "title": "Le bouclier intelligent",
+      "description": "Scrolfy intercepte vos pulsions et les transforme en moments d’apprentissage."
+    },
+    "slide3": {
+      "title": "Apprendre pour débloquer",
+      "description": "Un défi par jour pour muscler votre cerveau et mériter votre temps de divertissement."
+    },
+    "buttons": {
+      "next": "Suivant",
+      "start": "Commencer",
+      "skip": "Passer"
+    }
+  },
+  "setup": {
+    "profile_title": "Qui êtes-vous ?",
+    "student": "Étudiant / Élève",
+    "professional": "Professionnel / Actif",
+    "level_label": "Niveau scolaire",
+    "subject_label": "Sujet d'étude",
+    "activate_shield": "Activer le Bouclier"
+  }
+}

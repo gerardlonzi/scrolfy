@@ -6,10 +6,23 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "focusscreen",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": [
+          "instagram",
+          "fb",
+          "tg",
+          "whatsapp",
+          "snapchat",
+          "twitter",
+          "reddit",
+          "youtube",
+          "tiktok"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -38,7 +51,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -1,0 +1,102 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "save": "Save",
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System"
+  },
+  "tabs": {
+    "focus": "Focus",
+    "mastery": "Mastery",
+    "settings": "Settings"
+  },
+  "focus": {
+    "appsTitle": "Apps to monitor.",
+    "appsSubtitle": "Select the apps that distract you the most.",
+    "freeLimitTitle": "Free plan limit",
+    "freeLimitBody": "On the free plan you can monitor 1 app only (TikTok is Premium).",
+    "notInstalledTitle": "App not found",
+    "notInstalledBody": "{{name}} does not appear to be installed on this device (scheme: {{scheme}}).",
+    "customTitle": "Add a custom app",
+    "customHint": "A URL scheme (e.g. tg://) is required so we can verify the app is installed.",
+    "customNamePh": "Name (e.g. Messenger)",
+    "customSchemePh": "Scheme (e.g. tg://)",
+    "schemeRequiredTitle": "Scheme required",
+    "schemeRequiredBody": "Enter a URL scheme so we can verify installation before adding the app.",
+    "customInvalidScheme": "This scheme does not resolve — the app is probably not installed.",
+    "duplicateTitle": "Name already used",
+    "duplicateBody": "You already have an app named “{{name}}”. Pick a different name to avoid duplicates.",
+    "add": "Add",
+    "activate": "Activate shield",
+    "accessibilityTitle": "Accessibility permission",
+    "accessibilityBody": "To enable the shield on Android, open Accessibility and turn Scrolfy ON. This is a one-time setup.",
+    "shieldTitle": "System permissions",
+    "shieldBody": "Real app blocking needs Screen Time (iOS) or Accessibility / parental controls (Android). Open system settings to enable the right permissions for your device.",
+    "openOsSettings": "Open settings",
+    "selectedCount": "Selected: {{n}} / {{total}}",
+    "premium": "Premium",
+    "free": "Free"
+  },
+  "mastery": {
+    "title": "Your progress.",
+    "subtitle": "Every win counts. You are on the right track.",
+    "today": "TODAY",
+    "notions": "{{count}} concepts mastered today",
+    "cta": "Continue learning",
+    "saved": "{{minutes}} min of scrolling turned into study time.",
+    "streak": "{{days}}-day streak",
+    "streakHint": "Keep it up to unlock the “Focus Master” badge.",
+    "last": "Latest mastery",
+    "lastBody": "{{title}} — {{score}}% success.",
+    "analysisTitle": "Attention breakdown",
+    "analysisStatus": "Analysis in progress…",
+    "analysisBody": "{{answered}} quizzes · {{pct}}% success · your learning cycles are improving."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Profile data, language, theme, and shield.",
+    "profileSection": "Profile",
+    "editProfile": "Edit profiling",
+    "limits": "Scroll limits",
+    "premium": "Premium",
+    "quizDemo": "Try interception (quiz)",
+    "permissions": "Blocking permissions",
+    "permissionsHint": "Screen Time / Accessibility — required for real blocking on device."
+  },
+  "splash": {
+    "quote": "Scrolfy — your future starts here.",
+    "loading": "Loading",
+    "init": "Initializing"
+  },
+  "onboarding": {
+    "slide1": {
+      "title": "Scroll smarter.",
+      "description": "Every minute spent scrolling is a lost opportunity to grow. Take back control of your time."
+    },
+    "slide2": {
+      "title": "The intelligent shield",
+      "description": "Scrolfy intercepts your impulses and turns them into learning moments."
+    },
+    "slide3": {
+      "title": "Learn to unlock",
+      "description": "One challenge a day to sharpen your mind and earn your social media time."
+    },
+    "buttons": {
+      "next": "Next",
+      "start": "Get started",
+      "skip": "Skip"
+    }
+  },
+  "setup": {
+    "profile_title": "Who are you?",
+    "student": "Student",
+    "professional": "Professional",
+    "level_label": "Education Level",
+    "subject_label": "Main Subject",
+    "activate_shield": "Activate Shield"
+  }
+}
