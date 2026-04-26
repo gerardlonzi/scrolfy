@@ -20,6 +20,9 @@ import { KEYS } from '../../lib/keys';
 import { DEFAULT_PROFILE, DEFAULT_SHIELD, DEFAULT_STATS, dayKey } from '../../lib/defaults';
 import type { AppProfile, ShieldConfig, Stats } from '../../lib/appModel';
 import { generateQuestion } from '../../lib/quiz';
+import { useTranslation } from 'react-i18next';
+
+
 
 type QState = {
   id: string;
@@ -39,6 +42,9 @@ export default function FocusSessionScreen() {
   const { value: shield } = useStoredState<ShieldConfig>(KEYS.shield, DEFAULT_SHIELD);
   const { value: stats, setValue: setStats } = useStoredState<Stats>(KEYS.stats, DEFAULT_STATS);
   const statsRef = useRef(stats);
+  const { t } = useTranslation();
+
+
   statsRef.current = stats;
 
   const [loading, setLoading] = useState(true);
@@ -113,8 +119,7 @@ export default function FocusSessionScreen() {
             <View style={[styles.alert, { backgroundColor: '#FEE2E2' }]}>
               <Ionicons name="warning" size={16} color="#B91C1C" />
               <Text style={[styles.alertText, { color: '#7F1D1D' }]}>
-                Sans activation des permissions Android (notifications, accessibilite, overlay), le blocage des apps ne sera pas possible.
-              </Text>
+              {t('common.activePermissionNotif')} </Text>
             </View>
           </Container>
         ) : null}
