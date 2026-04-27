@@ -7,96 +7,220 @@
     "theme": "Thème",
     "themeLight": "Clair",
     "themeDark": "Sombre",
-    "themeSystem": "Système"
+    "themeSystem": "Système",
+    "activePermissionNotif": "Active les permissions Android pour débloquer toutes les fonctionnalités de protection. Sans cela, Scrolfy ne pourra pas t’aider à bloquer efficacement les distractions.",
+    "premiumLocked": "Reserve Premium"
   },
+
   "tabs": {
     "focus": "Focus",
     "mastery": "Maîtrise",
     "settings": "Réglages"
   },
+
   "focus": {
-    "appsTitle": "Applications à surveiller.",
+    "appsTitle": "Applications sous contrôle.",
     "appsSubtitle": "Sélectionnez les apps qui vous distraient le plus.",
     "freeLimitTitle": "Limite gratuite",
-    "freeLimitBody": "En version gratuite, vous pouvez surveiller 1 seule application (TikTok est réservé au Premium).",
+    "freeLimitBody": "En version gratuite, vous pouvez surveiller jusqu’à 3 applications.",
     "notInstalledTitle": "Application introuvable",
     "notInstalledBody": "{{name}} ne semble pas installée sur cet appareil (schéma : {{scheme}}).",
-    "customTitle": "Ajouter une app (personnalisée)",
-    "customHint": "Un schéma d’URL (ex. tg://) est obligatoire pour vérifier que l’app est installée.",
+    "customTitle": "Ajouter une application personnalisée",
+    "customHint": "Un schéma d’URL (ex. tg://) est requis pour vérifier l’application.",
     "customNamePh": "Nom (ex. Messenger)",
     "customSchemePh": "Schéma (ex. tg://)",
     "schemeRequiredTitle": "Schéma requis",
-    "schemeRequiredBody": "Indiquez un schéma d’URL pour vérifier l’installation avant d’ajouter l’app.",
-    "customInvalidScheme": "Ce schéma ne répond pas : l’app n’est probablement pas installée.",
+    "schemeRequiredBody": "Entrez un schéma valide pour vérifier l’installation.",
+    "customInvalidScheme": "Ce schéma est invalide — l’application n’est peut-être pas installée.",
     "duplicateTitle": "Nom déjà utilisé",
-    "duplicateBody": "Vous avez déjà une application nommée « {{name}} ». Choisissez un autre nom pour éviter les doublons.",
+    "duplicateBody": "Vous avez déjà une application nommée « {{name}} ». Choisissez un autre nom.",
     "add": "Ajouter",
     "activate": "Activer le bouclier",
     "accessibilityTitle": "Autorisation Accessibilité",
-    "accessibilityBody": "Pour activer le bouclier sur Android, ouvrez Accessibilité et activez Scrolfy. Cette étape ne se fait qu’une seule fois.",
+    "accessibilityBody": "Activez Scrolfy dans les paramètres d’accessibilité. C’est nécessaire pour bloquer les applications.",
     "shieldTitle": "Autorisations système",
-    "shieldBody": "Le blocage réel des apps nécessite Temps d’écran (iOS) ou Accessibilité / contrôle parental (Android). Ouvrez les réglages système pour activer les permissions adaptées à votre appareil.",
+    "shieldBody": "Le blocage des apps nécessite Temps d’écran (iOS) ou Accessibilité / contrôle parental (Android). Ouvrez les paramètres.",
     "openOsSettings": "Ouvrir les réglages",
+    "enableNotificationsBody": "Activez les notifications dans les réglages pour continuer.",
+    "enableAndroidPermissionsBody": "Activez Accessibilité et Overlay dans les réglages Android pour le blocage en temps réel.",
+    "iEnabledIt": "J’ai activé",
+    "requiredTitle": "Champ requis",
+    "requiredNameBody": "Veuillez saisir un nom d’application.",
+    "requiredSelectionBody": "Sélectionnez au moins une application à bloquer.",
     "selectedCount": "Sélectionnées : {{n}} / {{total}}",
     "premium": "Premium",
-    "free": "Gratuit"
+    "free": "Gratuit",
+    "stop": "Arreter la surveillance",
+    "controlHeader": "Applications selectionnees",
+    "dailyLimit": "⏱ Limite quotidienne (gratuit)",
+    "schedule": "📅 Planning",
+    "strictMode": "🔒 Mode strict",
+    "customLimit": "Personnalise"
   },
+
   "mastery": {
-    "title": "Votre progression.",
-    "subtitle": "Chaque victoire compte. Vous êtes sur la bonne voie.",
+    "title": "Votre progression",
+    "subtitle": "Chaque action compte. Vous progressez chaque jour.",
     "today": "AUJOURD’HUI",
-    "notions": "{{count}} notions maîtrisées aujourd'hui",
+    "notions": "{{count}} compétences maîtrisées aujourd’hui",
     "cta": "Continuer l’apprentissage",
-    "saved": "{{minutes}} min de scroll transformées en révision.",
+    "saved": "{{minutes}} min de scroll transformées en apprentissage",
     "streak": "Série de {{days}} jours",
-    "streakHint": "Continuez sur cette lancée pour débloquer le badge « Maître Focus ».",
-    "last": "Dernière maîtrise",
-    "lastBody": "{{title}} — {{score}}% de réussite.",
+    "streakHint": "Continuez pour débloquer le badge Focus Master",
+    "last": "Dernier résultat",
+    "lastBody": "{{title}} — {{score}}% de réussite",
     "analysisTitle": "Répartition de votre attention",
-    "analysisStatus": "Analyse en cours…",
-    "analysisBody": "{{answered}} quiz · {{pct}}% réussite · vos cycles d’apprentissage s’optimisent."
+    "analysisStatus": "Analyse en cours...",
+    "analysisBody": "{{answered}} quiz · {{pct}}% réussite · votre apprentissage progresse"
   },
+
   "settings": {
     "title": "Réglages",
-    "subtitle": "Données du profil, langue, thème et bouclier.",
+    "subtitle": "Profil, langue, thème et protection",
     "profileSection": "Profil",
-    "editProfile": "Modifier le profilage",
+    "editProfile": "Modifier le profil",
     "limits": "Limites de scroll",
+    "limitsSummary": "{{session}}′ / session · {{daily}}′ / jour",
     "premium": "Premium",
-    "quizDemo": "Tester une interception (quiz)",
+    "quizDemo": "Essayer un défi (démo)",
+    "quizDemoHint": "Quiz de session",
     "permissions": "Autorisations de blocage",
-    "permissionsHint": "Temps d’écran / Accessibilité — requis pour un blocage réel sur l’appareil."
+    "permissionsHint": "Temps d’écran / Accessibilité requis pour le blocage réel",
+    "resetData": "Réinitialiser l’application",
+    "resetDataConfirm": "Cette action supprime définitivement les données de l’application.",
+    "delete": "Supprimer",
+    "privacyPolicy": "Politique de confidentialité",
+    "privacyPolicyHint": "Comment vos données sont traitées",
+    "privacyPolicyBody": "Scrolfy stocke votre progression localement et conserve uniquement les données nécessaires au blocage et aux défis.",
+    "terms": "Conditions générales",
+    "termsHint": "Conditions d’utilisation et informations légales",
+    "termsBody": "En utilisant Scrolfy, vous acceptez d’utiliser les fonctionnalités de blocage et de défis de manière responsable et conforme à la réglementation locale.",
+    "contact": "Contact",
+    "focusControl": "Controle Focus",
+    "focusDailyLimit": "Limite quotidienne",
+    "focusDailyLimitHint": "{{daily}} min / jour",
+    "focusSchedule": "Blocage planifie",
+    "focusUnlockDelay": "Delai de deblocage",
+    "focusUnlockDelayHint": "{{n}}s",
+    "focusUnlockDelayPick": "Choisissez un delai",
+    "focusBehaviorPenalty": "Penalite comportementale",
+    "enabled": "Active"
   },
+  "session": {
+    "title": "Interception",
+    "focusCheck": "Vérification\nde focus",
+    "validate": "Valider ma réponse",
+    "anotherQuestion": "AUTRE QUESTION",
+    "reveal": "AFFICHER",
+    "correct": "Bonne réponse.",
+    "wrong": "Réponse incorrecte.",
+    "noAnswerTitle": "Aucune réponse sélectionnée",
+    "noAnswerBody": "Sélectionnez une réponse avant de valider.",
+    "limitReached": "Vous avez atteint votre limite de scroll.",
+    "limitReachedMotivation": "Reprenez le contrôle et investissez ce temps dans vos objectifs.",
+    "motivation": {
+      "correct1": "Excellent choix. Votre attention devient votre avantage.",
+      "correct2": "Bien joue. Vous entrainez votre cerveau a rester focus.",
+      "correct3": "Continuez comme ca. Votre discipline paie.",
+      "retry1": "Ce n est qu une etape. Reprenez et avancez.",
+      "retry2": "Votre focus se construit question apres question.",
+      "retry3": "Respirez, recommencez, progressez."
+    },
+    "upgrade": "Passer au Premium",
+    "startQuiz": "Demarrer le quiz",
+    "unlockDelayCountdown": "Demarrage dans {{s}}s",
+    "premiumTease": "Premium ajoute le delai de deblocage et le systeme de penalite comportementale."
+  },
+
   "splash": {
     "quote": "Scrolfy — votre futur commence ici.",
     "loading": "Chargement",
-    "init": "Initialisation"
+    "init": "Démarrage..."
   },
+
   "onboarding": {
     "slide1": {
       "title": "Scrollez intelligemment.",
-      "description": "Chaque minute de scroll est une opportunité perdue. Reprenez le contrôle de votre destin."
+      "description": "Chaque minute de scroll est du temps perdu. Reprenez le contrôle."
     },
     "slide2": {
       "title": "Le bouclier intelligent",
-      "description": "Scrolfy intercepte vos pulsions et les transforme en moments d’apprentissage."
+      "description": "Scrolfy bloque vos impulsions et les transforme en apprentissage."
     },
     "slide3": {
       "title": "Apprendre pour débloquer",
-      "description": "Un défi par jour pour muscler votre cerveau et mériter votre temps de divertissement."
+      "description": "Un défi par jour pour mériter votre temps de divertissement."
     },
+    "socialProof": "Les utilisateurs récupèrent jusqu’à 2h par jour avec Scrolfy.",
     "buttons": {
       "next": "Suivant",
       "start": "Commencer",
       "skip": "Passer"
     }
   },
+
   "setup": {
     "profile_title": "Qui êtes-vous ?",
-    "student": "Étudiant / Élève",
-    "professional": "Professionnel / Actif",
-    "level_label": "Niveau scolaire",
-    "subject_label": "Sujet d'étude",
-    "activate_shield": "Activer le Bouclier"
+    "profileHeadline": "Profil Scrolfy",
+    "profileSubhead": "Construisez votre profil de focus en quelques secondes.",
+    "purpose": {
+      "title": "Objectif",
+      "selectOne": "Selectionnez un objectif",
+      "reduce_distractions": "Reduire les distractions",
+      "study_better": "Mieux etudier / apprendre",
+      "increase_productivity": "Augmenter la productivite",
+      "control_screen_time": "Controler le temps d ecran"
+    },
+    "subject": {
+      "title": "Matiere",
+      "searchPlaceholder": "Rechercher une matiere",
+      "invalidTitle": "Matiere invalide",
+      "invalidBody": "Veuillez selectionner une matiere dans les suggestions."
+    },
+    "student": "Étudiant / Apprentissage",
+    "professional": "Professionnel / Travail",
+    "level_label": "Niveau",
+    "subject_label": "Centre d’intérêt",
+    "activate_shield": "Activer le bouclier"
+  },
+
+  "paywall": {
+    "title": "Débloque ton plein potentiel",
+    "subtitle": "Passe au niveau supérieur et reprends totalement le contrôle de ton attention",
+    "benefits": [
+      "Blocage illimité des applications",
+      "Système de défis avancés",
+      "Mode strict (aucune contournation possible)",
+      "Analyses détaillées de progression"
+    ],
+    "ctaTrial": "Essai gratuit",
+    "ctaContinue": "Continuer en gratuit",
+    "hint": "Annulation possible à tout moment",
+    "socialProof": "+5000 utilisateurs ont deja upgrade",
+    "features": "FONCTIONNALITES",
+    "free": "GRATUIT",
+    "premium": "PREMIUM",
+    "rows": {
+      "upTo3Apps": "Jusqu a 3 applications",
+      "simpleDailyLimit": "Limite quotidienne simple",
+      "unlimitedApps": "Applications illimitees",
+      "strictMode": "Mode strict",
+      "scheduleBlocking": "Blocage planifie",
+      "unlockDelay": "Systeme de delai de deblocage",
+      "behaviorPenalty": "Systeme de penalite comportementale",
+      "advancedAnalytics": "Analyses avancees"
+    }
+  },
+  "premiumModal": {
+    "title": "Disponible en Premium",
+    "body": "Debloquez les apps illimitees, le mode strict, le blocage planifie, le delai de deblocage et le controle total.",
+    "tryPremium": "Essayer Premium",
+    "continueFree": "Continuer en gratuit"
+  },
+
+  "subscriptionLock": {
+    "title": "Fonctionnalité verrouillée",
+    "body": "Cette fonctionnalité est réservée au Premium. Passe à la version supérieure pour l’activer.",
+    "cta": "Passer au Premium"
   }
 }

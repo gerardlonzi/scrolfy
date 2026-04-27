@@ -7,96 +7,222 @@
     "theme": "Theme",
     "themeLight": "Light",
     "themeDark": "Dark",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "activePermissionNotif": "Enable Android permissions to unlock full protection features. Without them, Scrolfy cannot fully help you block distractions.",
+    "premiumLocked": "Premium locked"
   },
+
   "tabs": {
     "focus": "Focus",
     "mastery": "Mastery",
     "settings": "Settings"
   },
+
   "focus": {
-    "appsTitle": "Apps to monitor.",
+    "appsTitle": "Apps under control.",
     "appsSubtitle": "Select the apps that distract you the most.",
     "freeLimitTitle": "Free plan limit",
-    "freeLimitBody": "On the free plan you can monitor 1 app only (TikTok is Premium).",
+    "freeLimitBody": "On the free plan, you can monitor up to 3 apps.",
     "notInstalledTitle": "App not found",
-    "notInstalledBody": "{{name}} does not appear to be installed on this device (scheme: {{scheme}}).",
+    "notInstalledBody": "{{name}} does not seem to be installed on this device (scheme: {{scheme}}).",
     "customTitle": "Add a custom app",
-    "customHint": "A URL scheme (e.g. tg://) is required so we can verify the app is installed.",
+    "customHint": "A URL scheme (e.g. tg://) is required to verify the app.",
     "customNamePh": "Name (e.g. Messenger)",
     "customSchemePh": "Scheme (e.g. tg://)",
     "schemeRequiredTitle": "Scheme required",
-    "schemeRequiredBody": "Enter a URL scheme so we can verify installation before adding the app.",
-    "customInvalidScheme": "This scheme does not resolve — the app is probably not installed.",
+    "schemeRequiredBody": "Enter a valid URL scheme to verify the app installation.",
+    "customInvalidScheme": "This scheme is invalid — the app may not be installed.",
     "duplicateTitle": "Name already used",
-    "duplicateBody": "You already have an app named “{{name}}”. Pick a different name to avoid duplicates.",
+    "duplicateBody": "You already have an app named “{{name}}”. Please choose another name.",
     "add": "Add",
-    "activate": "Activate shield",
+    "activate": "Activate Shield",
     "accessibilityTitle": "Accessibility permission",
-    "accessibilityBody": "To enable the shield on Android, open Accessibility and turn Scrolfy ON. This is a one-time setup.",
+    "accessibilityBody": "Enable Scrolfy in Accessibility settings. This is required for blocking apps.",
     "shieldTitle": "System permissions",
-    "shieldBody": "Real app blocking needs Screen Time (iOS) or Accessibility / parental controls (Android). Open system settings to enable the right permissions for your device.",
+    "shieldBody": "App blocking requires Screen Time (iOS) or Accessibility / parental control (Android). Open settings to enable permissions.",
     "openOsSettings": "Open settings",
+    "enableNotificationsBody": "Enable notifications in settings to continue.",
+    "enableAndroidPermissionsBody": "Enable Accessibility and Overlay in Android settings for real-time blocking.",
+    "iEnabledIt": "I enabled it",
+    "requiredTitle": "Required field",
+    "requiredNameBody": "Please enter an app name.",
+    "requiredSelectionBody": "Select at least one app to block.",
     "selectedCount": "Selected: {{n}} / {{total}}",
     "premium": "Premium",
-    "free": "Free"
+    "free": "Free",
+    "stop": "Stop monitoring"
+    ,
+    "controlHeader": "Apps selected",
+    "dailyLimit": "⏱ Daily limit (free)",
+    "schedule": "📅 Schedule",
+    "strictMode": "🔒 Strict mode",
+    "customLimit": "Custom"
   },
+
   "mastery": {
-    "title": "Your progress.",
-    "subtitle": "Every win counts. You are on the right track.",
+    "title": "Your progress",
+    "subtitle": "Every action counts. You're improving every day.",
     "today": "TODAY",
-    "notions": "{{count}} concepts mastered today",
+    "notions": "{{count}} skills mastered today",
     "cta": "Continue learning",
-    "saved": "{{minutes}} min of scrolling turned into study time.",
+    "saved": "{{minutes}} min of scrolling turned into learning",
     "streak": "{{days}}-day streak",
-    "streakHint": "Keep it up to unlock the “Focus Master” badge.",
-    "last": "Latest mastery",
-    "lastBody": "{{title}} — {{score}}% success.",
+    "streakHint": "Keep going to unlock the Focus Master badge",
+    "last": "Latest result",
+    "lastBody": "{{title}} — {{score}}% success",
     "analysisTitle": "Attention breakdown",
-    "analysisStatus": "Analysis in progress…",
-    "analysisBody": "{{answered}} quizzes · {{pct}}% success · your learning cycles are improving."
+    "analysisStatus": "Analysis running...",
+    "analysisBody": "{{answered}} quizzes · {{pct}}% success · your learning is improving"
   },
+
   "settings": {
     "title": "Settings",
-    "subtitle": "Profile data, language, theme, and shield.",
+    "subtitle": "Profile, language, theme, and protection",
     "profileSection": "Profile",
-    "editProfile": "Edit profiling",
+    "editProfile": "Edit profile",
     "limits": "Scroll limits",
+    "limitsSummary": "{{session}}′ / session · {{daily}}′ / day",
     "premium": "Premium",
-    "quizDemo": "Try interception (quiz)",
+    "quizDemo": "Try a challenge (demo)",
+    "quizDemoHint": "Session quiz",
     "permissions": "Blocking permissions",
-    "permissionsHint": "Screen Time / Accessibility — required for real blocking on device."
+    "permissionsHint": "Screen Time / Accessibility required for real blocking",
+    "resetData": "Reset app",
+    "resetDataConfirm": "This will delete your app data permanently.",
+    "delete": "Delete",
+    "privacyPolicy": "Privacy policy",
+    "privacyPolicyHint": "How your data is handled",
+    "privacyPolicyBody": "Scrolfy stores your progress locally and only keeps the minimum data required to provide blocking and challenge features.",
+    "terms": "Terms & conditions",
+    "termsHint": "Usage terms and legal details",
+    "termsBody": "By using Scrolfy, you agree to use blocking and challenge features responsibly and in compliance with your local regulations.",
+    "contact": "Contact"
+    ,
+    "focusControl": "Focus control",
+    "focusDailyLimit": "Daily scroll limit",
+    "focusDailyLimitHint": "{{daily}} min / day",
+    "focusSchedule": "Schedule blocking",
+    "focusUnlockDelay": "Unlock delay",
+    "focusUnlockDelayHint": "{{n}}s",
+    "focusUnlockDelayPick": "Choose a delay",
+    "focusBehaviorPenalty": "Behavioral penalty",
+    "enabled": "Enabled"
   },
+  "session": {
+    "title": "Interception",
+    "focusCheck": "Focus\nverification",
+    "validate": "Validate my answer",
+    "anotherQuestion": "ANOTHER QUESTION",
+    "reveal": "REVEAL",
+    "correct": "Great answer.",
+    "wrong": "Not correct yet.",
+    "noAnswerTitle": "No answer selected",
+    "noAnswerBody": "Select an answer before validation.",
+    "limitReached": "You have reached your scroll limit.",
+    "limitReachedMotivation": "Refocus now and invest this time into your goals.",
+    "motivation": {
+      "correct1": "Excellent choice. Your attention is becoming your advantage.",
+      "correct2": "Great work. You are training your brain to stay focused.",
+      "correct3": "Keep going. Your discipline is paying off.",
+      "retry1": "This is one step. Reset and move forward.",
+      "retry2": "Your focus gets stronger one question at a time.",
+      "retry3": "Breathe, retry, improve."
+    },
+    "upgrade": "Upgrade to Premium",
+    "startQuiz": "Start quiz",
+    "unlockDelayCountdown": "Starting in {{s}}s",
+    "premiumTease": "Premium adds unlock delay and behavioral penalty system."
+  },
+
   "splash": {
     "quote": "Scrolfy — your future starts here.",
     "loading": "Loading",
-    "init": "Initializing"
+    "init": "Starting..."
   },
+
   "onboarding": {
     "slide1": {
       "title": "Scroll smarter.",
-      "description": "Every minute spent scrolling is a lost opportunity to grow. Take back control of your time."
+      "description": "Every minute you scroll is time you lose. Take control back."
     },
     "slide2": {
-      "title": "The intelligent shield",
-      "description": "Scrolfy intercepts your impulses and turns them into learning moments."
+      "title": "The smart shield",
+      "description": "Scrolfy blocks your impulses and turns them into learning moments."
     },
     "slide3": {
       "title": "Learn to unlock",
-      "description": "One challenge a day to sharpen your mind and earn your social media time."
+      "description": "One challenge per day to earn your entertainment time."
     },
+    "socialProof": "Users save up to 2 hours per day with Scrolfy.",
     "buttons": {
       "next": "Next",
       "start": "Get started",
       "skip": "Skip"
     }
   },
+
   "setup": {
     "profile_title": "Who are you?",
-    "student": "Student",
-    "professional": "Professional",
-    "level_label": "Education Level",
-    "subject_label": "Main Subject",
+    "profileHeadline": "Scrolfy profile",
+    "profileSubhead": "Build your focus profile in seconds.",
+    "purpose": {
+      "title": "Purpose",
+      "selectOne": "Select one purpose",
+      "reduce_distractions": "Reduce distractions",
+      "study_better": "Study / Learn better",
+      "increase_productivity": "Increase productivity",
+      "control_screen_time": "Control screen time"
+    },
+    "subject": {
+      "title": "Subject",
+      "searchPlaceholder": "Search subject",
+      "invalidTitle": "Invalid subject",
+      "invalidBody": "Please select a subject from suggestions."
+    },
+    "student": "Student / Learning",
+    "professional": "Professional / Working",
+    "level_label": "Level",
+    "subject_label": "Main focus",
     "activate_shield": "Activate Shield"
+  },
+
+  "paywall": {
+    "title": "Unlock your full potential",
+    "subtitle": "Go beyond limits and take full control of your attention",
+    "benefits": [
+      "Unlimited app blocking",
+      "Advanced challenge system",
+      "Strict mode (no bypass)",
+      "Deep progress analytics"
+    ],
+    "ctaTrial": "Start free trial",
+    "ctaContinue": "Continue with free plan",
+    "hint": "You can cancel anytime",
+    "socialProof": "+5000 users already upgraded",
+    "features": "FEATURES",
+    "free": "FREE",
+    "premium": "PREMIUM",
+    "rows": {
+      "upTo3Apps": "Up to 3 apps",
+      "simpleDailyLimit": "Simple daily limit",
+      "unlimitedApps": "Unlimited apps",
+      "strictMode": "Strict mode",
+      "scheduleBlocking": "Schedule blocking",
+      "unlockDelay": "Unlock delay system",
+      "behaviorPenalty": "Behavior penalty system",
+      "advancedAnalytics": "Advanced analytics"
+    }
+  },
+  "premiumModal": {
+    "title": "Available in Premium",
+    "body": "Unlock unlimited apps, strict mode, schedule blocking, unlock delay and full control.",
+    "tryPremium": "Try Premium",
+    "continueFree": "Continue Free"
+  },
+
+  "subscriptionLock": {
+    "title": "Feature locked",
+    "body": "This feature is part of Scrolfy Premium. Upgrade to unlock it.",
+    "cta": "Upgrade now"
   }
 }
