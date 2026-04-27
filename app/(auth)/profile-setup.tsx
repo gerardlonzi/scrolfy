@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -8,6 +10,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,12 +21,17 @@ import { useTranslation } from 'react-i18next';
 import HeaderBar from '../../components/ui/headerBar';
 import { KEYS } from '../../lib/keys';
 import { DEFAULT_PROFILE, DEFAULT_SHIELD } from '../../lib/defaults';
-import type { AppProfile, ShieldConfig, Situation } from '../../lib/appModel';
+import type { AppProfile, ShieldConfig } from '../../lib/appModel';
 import { useStoredState } from '../../lib/useStored';
+import { QUESTION_BANK } from '../../data/questionBank';
 
-const LEVELS = ['6ème', '5ème', '4ème', '3ème', 'Seconde', 'Première', 'Terminale', 'Licence', 'Master', 'Doctorat'];
-const STUDENT_SUBJECTS = ['Philosophie', 'Mathématiques', 'Physique', 'Histoire', 'Anglais', 'Économie', 'Informatique'];
-const PRO_TOPICS = ['Leadership', 'Gestion de Projet', 'Management', 'Finance', 'Culture Générale', 'Motivation', 'Langues'];
+const STUDENT_SUBJECTS = Object.keys(QUESTION_BANK).map((s) => s.charAt(0).toUpperCase() + s.slice(1));
+const PURPOSES: Array<{ id: NonNullable<AppProfile['purpose']>; label: string }> = [
+  { id: 'reduce_distractions', label: 'setup.purpose.reduce_distractions' },
+  { id: 'study_better', label: 'setup.purpose.study_better' },
+  { id: 'increase_productivity', label: 'setup.purpose.increase_productivity' },
+  { id: 'control_screen_time', label: 'setup.purpose.control_screen_time' },
+];
 
 export default function ProfileSetupScreen() {
   const theme = useTheme();
@@ -38,7 +46,7 @@ export default function ProfileSetupScreen() {
   const { value: shield, setValue: setShield } = useStoredState<ShieldConfig>(KEYS.shield, DEFAULT_SHIELD);
 
   const [query, setQuery] = useState(profile.subject ?? 'Philosophie');
-  const [customGoal, setCustomGoal] = useState(profile.customGoal ?? '');
+  const [selectedSubject, setSelectedSubject] = useState(profile.subject ?? 'Philosophie');
   const didInitInputs = useRef(false);
   const permissionsComplete = useMemo(() => {
     const p = shield.permissions ?? {};
@@ -52,24 +60,24 @@ export default function ProfileSetupScreen() {
     if (didInitInputs.current) return;
     didInitInputs.current = true;
     setQuery(profile.subject ?? '');
-    setCustomGoal(profile.customGoal ?? '');
-  }, [ready, profile.subject, profile.customGoal]);
+    setSelectedSubject(profile.subject ?? 'Philosophie');
+  }, [ready, profile.subject, profile.customGoal, profile.proTopics]);
 
-  const levelIndex = useMemo(() => Math.max(0, LEVELS.indexOf(profile.level ?? 'Doctorat')), [profile.level]);
   const subjectSuggestions = useMemo(() => {
     const q = (query ?? '').trim().toLowerCase();
-    if (!q) return STUDENT_SUBJECTS;
+    if (!q) return STUDENT_SUBJECTS.slice(0, 6);
     return STUDENT_SUBJECTS.filter((s) => s.toLowerCase().includes(q));
   }, [query]);
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
         <HeaderBar title={t('setup.profile_title')} showSettings={!isEditFlow} />
 
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
         >
           <ScrollView
@@ -80,17 +88,7 @@ export default function ProfileSetupScreen() {
             automaticallyAdjustKeyboardInsets
           >
           <Container paddingX="xl">
-            {!permissionsComplete ? (
-              <>
-                <View style={[styles.warningBox, { backgroundColor: '#FEE2E2' }]}>
-                  <Ionicons name="warning" size={16} color="#B91C1C" />
-                  <Text style={[styles.warningText, { color: '#7F1D1D' }]}>
-                    Sans activation des permissions Android (notifications, accessibilite, overlay), le blocage des apps ne sera pas possible.
-                  </Text>
-                </View>
-                <View style={{ height: s.md }} />
-              </>
-            ) : null}
+            
             <View style={[styles.progressTrack, { backgroundColor: colors.surfaceContainerLow }]}>
               <View style={[styles.progressFill, { width: '33%', backgroundColor: colors.secondary }]} />
             </View>
@@ -98,62 +96,48 @@ export default function ProfileSetupScreen() {
             <View style={{ height: s.md }} />
 
             <Text style={[styles.kicker, { color: colors.onSurfaceVariant }]}>SCROLFY</Text>
-            <Text style={[styles.title, { color: colors.text }]}>Quelle est votre{'\n'}situation ?</Text>
+            <Text style={[styles.title, { color: colors.text }]}>{t('setup.profileHeadline')}</Text>
             <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
-              Personnalisons votre sanctuaire d’apprentissage pour maximiser votre flow.
+              {t('setup.profileSubhead')}
             </Text>
 
             <View style={{ height: s.lg }} />
 
-            <ChoiceCard
-              active={profile.situation === 'student'}
-              title="Élève / Étudiant"
-              description="Pour ceux qui naviguent dans le monde académique."
-              iconName="school-outline"
-              onPress={() => void setProfile((p) => ({ ...p, situation: 'student' }))}
-            />
-            <View style={{ height: s.md }} />
-            <ChoiceCard
-              active={profile.situation === 'pro'}
-              title="Professionnel"
-              description="Pour ceux qui optimisent leur carrière et compétences."
-              iconName="briefcase-outline"
-              onPress={() => void setProfile((p) => ({ ...p, situation: 'pro' }))}
-            />
-
-            <View style={{ height: s.xl }} />
-
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Précisez vos objectifs</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('setup.purpose.title')}</Text>
 
             <View style={{ height: s.lg }} />
 
             <SurfaceCard>
-              {profile.situation === 'student' ? (
-                <>
-                  <Text style={[styles.fieldLabel, { color: colors.onSurfaceVariant }]}>Définissez votre niveau</Text>
-                  <TouchableOpacity
-                    style={[styles.select, { backgroundColor: colors.surface }]}
-                    onPress={() => void setProfile((p) => ({ ...p, level: LEVELS[(levelIndex + 1) % LEVELS.length] }))}
-                    accessibilityRole="button"
-                  >
-                    <Text style={[styles.selectText, { color: colors.text }]}>{profile.level ?? 'Doctorat'}</Text>
-                    <Ionicons name="chevron-down" size={18} color={colors.onSurfaceVariant} />
-                  </TouchableOpacity>
-
+                  <Text style={[styles.fieldLabel, { color: colors.onSurfaceVariant }]}>{t('setup.purpose.selectOne')}</Text>
+                  <View style={styles.suggestions}>
+                    {PURPOSES.map((purpose) => (
+                      <TouchableOpacity
+                        key={purpose.id}
+                        style={[
+                          styles.suggestion,
+                          { backgroundColor: profile.purpose === purpose.id ? colors.secondary : colors.surface },
+                        ]}
+                        onPress={() => void setProfile((p) => ({ ...p, situation: 'student', purpose: purpose.id }))}
+                      >
+                        <Text style={[styles.suggestionText, { color: profile.purpose === purpose.id ? colors.obsidian : colors.text }]}>
+                          {t(purpose.label)}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
                   <View style={{ height: s.md }} />
-
-                  <Text style={[styles.fieldLabel, { color: colors.onSurfaceVariant }]}>Matière cible</Text>
+                  <Text style={[styles.fieldLabel, { color: colors.onSurfaceVariant }]}>{t('setup.subject.title')}</Text>
                   <View style={[styles.inputRow, { backgroundColor: colors.surface }]}>
                     <TextInput
                       value={query}
-                      onChangeText={(v) => {
-                        setQuery(v);
-                        void setProfile((p) => ({ ...p, subject: v }));
-                      }}
-                      placeholder="Ex: Philosophie"
+                      onChangeText={setQuery}
+                      placeholder={t('setup.subject.searchPlaceholder')}
                       placeholderTextColor={colors.onSurfaceVariant}
                       style={[styles.input, { color: colors.text }]}
-                      blurOnSubmit={false}
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      returnKeyType="done"
+                      blurOnSubmit
                     />
                     <Ionicons name="search" size={18} color={colors.onSurfaceVariant} />
                   </View>
@@ -165,54 +149,13 @@ export default function ProfileSetupScreen() {
                         style={[styles.suggestion, { backgroundColor: colors.surface }]}
                         onPress={() => {
                           setQuery(subj);
-                          void setProfile((p) => ({ ...p, subject: subj }));
+                          setSelectedSubject(subj);
                         }}
                       >
                         <Text style={[styles.suggestionText, { color: colors.text }]}>{subj}</Text>
                       </TouchableOpacity>
                     ))}
                   </View>
-                </>
-              ) : (
-                <>
-                  <Text style={[styles.fieldLabel, { color: colors.onSurfaceVariant }]}>Sujets d’intérêt</Text>
-                  <View style={styles.chipsRow}>
-                    {PRO_TOPICS.map((t) => (
-                      <TopicChip
-                        key={t}
-                        text={t}
-                        active={Boolean(profile.proTopics?.includes(t))}
-                        onToggle={() =>
-                          void setProfile((p) => {
-                            const cur = new Set(p.proTopics ?? []);
-                            if (cur.has(t)) cur.delete(t);
-                            else cur.add(t);
-                            return { ...p, proTopics: Array.from(cur) };
-                          })
-                        }
-                      />
-                    ))}
-                  </View>
-
-                  <View style={{ height: s.md }} />
-
-                  <Text style={[styles.fieldLabel, { color: colors.onSurfaceVariant }]}>Objectif personnalisé</Text>
-                  <View style={[styles.inputRow, { backgroundColor: colors.surface }]}>
-                    <TextInput
-                      value={customGoal}
-                      onChangeText={(v) => {
-                        setCustomGoal(v);
-                        void setProfile((p) => ({ ...p, customGoal: v }));
-                      }}
-                      placeholder="Ex: Négociation, Productivité…"
-                      placeholderTextColor={colors.onSurfaceVariant}
-                      style={[styles.input, { color: colors.text }]}
-                      blurOnSubmit={false}
-                    />
-                    <Ionicons name="sparkles-outline" size={18} color={colors.onSurfaceVariant} />
-                  </View>
-                </>
-              )}
             </SurfaceCard>
 
             <View style={{ height: s.xl }} />
@@ -228,13 +171,17 @@ export default function ProfileSetupScreen() {
               style={[styles.primaryCta, { backgroundColor: theme.isDark ? colors.secondary : colors.obsidian }]}
               activeOpacity={0.9}
               onPress={async () => {
-                const subjectFinal =
-                  profile.situation === 'student' ? (query.trim() || profile.subject || 'Philosophie') : profile.subject;
-                const goalFinal = profile.situation === 'pro' ? customGoal.trim() : profile.customGoal ?? '';
+                const subjectFinal = selectedSubject || profile.subject || STUDENT_SUBJECTS[0];
+                if (!STUDENT_SUBJECTS.includes(subjectFinal)) {
+                  Alert.alert(t('setup.subject.invalidTitle'), t('setup.subject.invalidBody'));
+                  return;
+                }
                 await setProfile((p) => ({
                   ...p,
+                  situation: 'student',
                   subject: subjectFinal,
-                  customGoal: goalFinal,
+                  customGoal: '',
+                  proTopics: [],
                   ...(!isEditFlow ? { completedOnboarding: true } : {}),
                 }));
                 if (!isEditFlow) {
@@ -245,7 +192,7 @@ export default function ProfileSetupScreen() {
                 }
               }}
             >
-              <Text style={[styles.primaryCtaText, { color: colors.cloud }]}>Suivant</Text>
+              <Text style={[styles.primaryCtaText, { color: colors.cloud }]}>{t('common.continue')}</Text>
               <Ionicons name="arrow-forward" size={18} color={colors.cloud} />
             </TouchableOpacity>
           </Container>
@@ -253,73 +200,11 @@ export default function ProfileSetupScreen() {
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
+    </TouchableWithoutFeedback>
   );
 
   function SurfaceCard({ children }: { children: React.ReactNode }) {
     return <View style={[styles.surfaceCard, { backgroundColor: colors.surfaceContainerLow }]}>{children}</View>;
-  }
-
-  function ChoiceCard({
-    active,
-    title,
-    description,
-    iconName,
-    onPress,
-  }: {
-    active: boolean;
-    title: string;
-    description: string;
-    iconName: any;
-    onPress: () => void;
-  }) {
-    return (
-      <TouchableOpacity
-        accessibilityRole="button"
-        activeOpacity={0.9}
-        onPress={onPress}
-        style={[
-          styles.choiceCard,
-          {
-            backgroundColor: colors.surfaceContainerLow,
-            borderColor: active ? colors.secondary : 'transparent',
-          },
-        ]}
-      >
-        <View style={[styles.choiceIcon, { backgroundColor: colors.surface }]}>
-          <Ionicons name={iconName} size={18} color={colors.text} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.choiceTitle, { color: colors.text }]}>{title}</Text>
-          <Text style={[styles.choiceDesc, { color: colors.onSurfaceVariant }]}>{description}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  }
-
-  function Chip({ text }: { text: string }) {
-    return (
-      <View style={[styles.chip, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.chipText, { color: colors.text }]}>{text}</Text>
-      </View>
-    );
-  }
-
-  function TopicChip({ text, active, onToggle }: { text: string; active: boolean; onToggle: () => void }) {
-    return (
-      <TouchableOpacity
-        accessibilityRole="button"
-        activeOpacity={0.9}
-        onPress={onToggle}
-        style={[
-          styles.chip,
-          {
-            backgroundColor: active ? colors.secondary : colors.surface,
-          },
-        ]}
-      >
-        <Text style={[styles.chipText, { color: active ? colors.obsidian : colors.text }]}>{text}</Text>
-      </TouchableOpacity>
-    );
   }
 }
 
