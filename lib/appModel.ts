@@ -3,6 +3,7 @@ export type Situation = 'student' | 'pro';
 export type AppProfile = {
   completedOnboarding: boolean;
   situation: Situation;
+  purpose?: 'reduce_distractions' | 'study_better' | 'increase_productivity' | 'control_screen_time';
   level?: string;
   subject?: string;
   proTopics?: string[];
@@ -41,15 +42,33 @@ export type ShieldConfig = {
     overlayAcknowledged?: boolean;
     accessibilityGuided?: boolean;
   };
+  premium?: {
+    strictMode: boolean;
+    scheduleBlocking: {
+      enabled: boolean;
+      startHour: number;
+      endHour: number;
+      ranges: Array<{ startHour: number; endHour: number }>;
+    };
+    unlockDelaySeconds: number;
+    unlockDelayEnabled: boolean;
+    behaviorPenaltyEnabled: boolean;
+    behaviorPenaltyFullBlock: boolean;
+    behaviorPenaltyScore: number;
+    analyticsEnabled: boolean;
+  };
 };
 
 export type Stats = {
   savedMinutes: number;
   streakDays: number;
   lastQuizDayKey?: string; // YYYY-MM-DD
+  lastActiveDayKey?: string; // YYYY-MM-DD
   lastMastery?: { title: string; scorePct: number; at: number };
   answered: number;
   correct: number;
+  xp: number;
+  level: number;
   askedQuestionIds?: string[];
 };
 

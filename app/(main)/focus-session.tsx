@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Alert,
   ActivityIndicator,
   Platform,
   SafeAreaView,
@@ -14,13 +15,14 @@ import Container from '../../components/ui/container';
 import { useTheme } from '../../constants/themeContext';
 import HeaderBar from '../../components/ui/headerBar';
 import GradientButton from '../../components/ui/GradientButton';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useStoredState } from '../../lib/useStored';
 import { KEYS } from '../../lib/keys';
-import { DEFAULT_PROFILE, DEFAULT_SHIELD, DEFAULT_STATS, dayKey } from '../../lib/defaults';
-import type { AppProfile, ShieldConfig, Stats } from '../../lib/appModel';
+import { DEFAULT_PROFILE, DEFAULT_SHIELD, DEFAULT_STATS, DEFAULT_SUBSCRIPTION, dayKey } from '../../lib/defaults';
+import type { AppProfile, ShieldConfig, Stats, Subscription } from '../../lib/appModel';
 import { generateQuestion } from '../../lib/quiz';
 import { useTranslation } from 'react-i18next';
+import { premiumFeatureFlags } from '../../lib/featureFlags';
 
 
 
@@ -38,20 +40,33 @@ export default function FocusSessionScreen() {
   const s = theme.spacing;
   const params = useLocalSearchParams<{ source?: string }>();
   const isDemo = params?.source === 'demo';
+  const router = useRouter();
   const { value: profile } = useStoredState<AppProfile>(KEYS.profile, DEFAULT_PROFILE);
-  const { value: shield } = useStoredState<ShieldConfig>(KEYS.shield, DEFAULT_SHIELD);
+  const { value: shield, setValue: setShield } = useStoredState<ShieldConfig>(KEYS.shield, DEFAULT_SHIELD);
+  const { value: sub } = useStoredState<Subscription>(KEYS.subscription, DEFAULT_SUBSCRIPTION);
   const { value: stats, setValue: setStats } = useStoredState<Stats>(KEYS.stats, DEFAULT_STATS);
+  const flags = premiumFeatureFlags();
   const statsRef = useRef(stats);
   const { t } = useTranslation();
+  const positiveMicroTexts = useMemo(
+    () => [t('session.motivation.correct1'), t('session.motivation.correct2'), t('session.motivation.correct3')],
+    [t],
+  );
+  const retryMicroTexts = useMemo(
+    () => [t('session.motivation.retry1'), t('session.motivation.retry2'), t('session.motivation.retry3')],
+    [t],
+  );
 
 
   statsRef.current = stats;
 
   const [loading, setLoading] = useState(true);
-  const [source, setSource] = useState<'offline' | 'ai'>('offline');
+  const [source, setSource] = useState<'offline'>('offline');
   const [q, setQ] = useState<QState | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const [interceptionConfirmed, setInterceptionConfirmed] = useState(false);
+  const [delayRemaining, setDelayRemaining] = useState(0);
 
   const shouldShowAlert = useMemo(() => {
     const maxSession = shield.limits.sessionMaxMinutes ?? 0;
@@ -71,33 +86,49 @@ export default function FocusSessionScreen() {
   ]);
 
   const isCorrect = useMemo(() => (q && selected != null ? selected === q.correctIndex : false), [q, selected]);
+  const showInterceptionGate = shouldShowAlert && !isDemo && !interceptionConfirmed;
 
   const loadQuestion = useCallback(async () => {
     setLoading(true);
     setRevealed(false);
     setSelected(null);
-    const asked = statsRef.current.askedQuestionIds ?? [];
-    const res = await generateQuestion(profile, asked);
-    setSource(res.source);
-    const next: QState = {
-      id: res.question.id,
-      prompt: res.question.prompt,
-      options: res.question.options,
-      correctIndex: res.question.correctIndex,
-      explanation: res.question.explanation,
-    };
-    setQ(next);
-    await setStats((prev) => {
-      const merged = Array.from(new Set([...(prev.askedQuestionIds ?? []), next.id]));
-      return { ...prev, askedQuestionIds: merged.slice(-200) };
-    });
+    try {
+      const asked = statsRef.current.askedQuestionIds ?? [];
+      const res = await generateQuestion(profile, asked, {
+        correct: statsRef.current.correct,
+        answered: statsRef.current.answered,
+      });
+      setSource(res.source);
+      const next: QState = {
+        id: res.question.id,
+        prompt: res.question.prompt,
+        options: res.question.options,
+        correctIndex: res.question.correctIndex,
+        explanation: res.question.explanation,
+      };
+      setQ(next);
+      await setStats((prev) => {
+        const merged = Array.from(new Set([...(prev.askedQuestionIds ?? []), next.id]));
+        return { ...prev, askedQuestionIds: merged.slice(-200) };
+      });
+    } catch {
+      setQ(null);
+      Alert.alert(t('session.doneTitle'), t('session.doneBody'));
+    }
     setLoading(false);
-  }, [profile, setStats]);
+  }, [profile, setStats, t]);
 
   useEffect(() => {
+    if (showInterceptionGate) return;
     void loadQuestion();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- chargement initial uniquement
-  }, []);
+  }, [showInterceptionGate]);
+
+  useEffect(() => {
+    if (delayRemaining <= 0) return;
+    const timer = setTimeout(() => setDelayRemaining((prev) => prev - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [delayRemaining]);
 
   const muted = theme.isDark ? 'rgba(248,250,252,0.72)' : colors.onSurfaceVariant;
   const cardBg = theme.isDark ? 'rgba(248,250,252,0.08)' : colors.surfaceContainerLow;
@@ -112,7 +143,7 @@ export default function FocusSessionScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
-        <HeaderBar title="Interception" showSettings={false} />
+        <HeaderBar title={t('session.title')} showSettings={false} />
 
         {!permissionsComplete ? (
           <Container paddingX="xl" style={styles.alertWrap}>
@@ -124,18 +155,51 @@ export default function FocusSessionScreen() {
           </Container>
         ) : null}
 
-        {shouldShowAlert && !isDemo ? (
+        {showInterceptionGate ? (
           <Container paddingX="xl" style={styles.alertWrap}>
-            <View style={[styles.alert, { backgroundColor: theme.isDark ? 'rgba(254,226,226,0.22)' : '#FEE2E2' }]}>
+            <View style={[styles.gateCard, { backgroundColor: theme.isDark ? 'rgba(254,226,226,0.22)' : '#FEE2E2' }]}>
               <Ionicons name="warning" size={16} color="#B91C1C" />
-              <Text style={[styles.alertText, { color: theme.isDark ? '#FECACA' : '#7F1D1D' }]}>
-                Attention : vous avez dépassé votre limite de scroll définie. Validez ce quiz pour continuer.
-              </Text>
+              <Text style={[styles.alertText, { color: theme.isDark ? '#FECACA' : '#7F1D1D' }]}>{t('session.limitReached')}</Text>
+              <Text style={[styles.gateMotivation, { color: theme.isDark ? '#FECACA' : '#7F1D1D' }]}>{t('session.limitReachedMotivation')}</Text>
+              <Text style={[styles.gateTease, { color: theme.isDark ? '#FECACA' : '#7F1D1D' }]}>{t('session.premiumTease')}</Text>
+              <View style={styles.gateActions}>
+                <TouchableOpacity
+                  style={[styles.gateBtnPrimary, { backgroundColor: colors.obsidian }]}
+                  onPress={() => {
+                    const delay =
+                      flags.unlockDelay && sub.isPremium && shield.premium?.unlockDelayEnabled
+                        ? shield.premium.unlockDelaySeconds ?? 0
+                        : 0;
+                    if (delay > 0) {
+                      setDelayRemaining(delay);
+                      return;
+                    }
+                    setInterceptionConfirmed(true);
+                  }}
+                >
+                  <Text style={styles.gateBtnPrimaryText}>
+                    {delayRemaining > 0 ? t('session.unlockDelayCountdown', { s: delayRemaining }) : t('common.continue')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.gateBtnSecondary, { backgroundColor: colors.surface }]}
+                  onPress={() => router.push('/(main)/paywall')}
+                >
+                  <Text style={[styles.gateBtnSecondaryText, { color: colors.text }]}>{t('session.upgrade')}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </Container>
         ) : null}
+        {delayRemaining === 0 && !interceptionConfirmed && showInterceptionGate ? (
+          <Container paddingX="xl">
+            <TouchableOpacity style={[styles.delayDoneBtn, { backgroundColor: colors.secondary }]} onPress={() => setInterceptionConfirmed(true)}>
+              <Text style={[styles.delayDoneText, { color: colors.obsidian }]}>{t('session.startQuiz')}</Text>
+            </TouchableOpacity>
+          </Container>
+        ) : null}
 
-        <ScrollView
+        {!showInterceptionGate ? <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: s.xxl }}
           showsVerticalScrollIndicator={false}
@@ -146,7 +210,7 @@ export default function FocusSessionScreen() {
               <Text style={[styles.kicker, { color: muted }]}>SCROLFY · {source.toUpperCase()}</Text>
             </View>
 
-            <Text style={[styles.title, { color: colors.text }]}>Vérification de{'\n'}focus</Text>
+            <Text style={[styles.title, { color: colors.text }]}>{t('session.focusCheck')}</Text>
             {loading || !q ? (
               <View style={{ height: 120, alignItems: 'center', justifyContent: 'center' }}>
                 <ActivityIndicator color={colors.secondary} />
@@ -180,49 +244,74 @@ export default function FocusSessionScreen() {
             <View style={{ height: s.xl }} />
 
             <GradientButton
-              title="Valider ma réponse"
+              title={t('session.validate')}
               onPress={async () => {
+                if (selected == null) {
+                  Alert.alert(t('session.noAnswerTitle'), t('session.noAnswerBody'));
+                  return;
+                }
                 setRevealed(true);
-                if (!q || selected == null) return;
+                if (!q) return;
 
                 await setStats((prev) => {
                   const today = dayKey();
                   const answered = prev.answered + 1;
                   const correct = prev.correct + (selected === q.correctIndex ? 1 : 0);
+                  const gainedXp = selected === q.correctIndex ? 10 : 2;
+                  let xp = prev.xp + gainedXp;
 
-                  let streak = prev.streakDays;
-                  if (selected === q.correctIndex) {
-                    if (prev.lastQuizDayKey && prev.lastQuizDayKey !== today) {
-                      const prevDate = new Date(prev.lastQuizDayKey);
-                      const todayDate = new Date(today);
-                      const diffDays = Math.round((todayDate.getTime() - prevDate.getTime()) / 86_400_000);
-                      streak = diffDays === 1 ? streak + 1 : 1;
-                    } else if (!prev.lastQuizDayKey) {
-                      streak = 1;
-                    }
+                  let streak = prev.streakDays || 0;
+                  if (!prev.lastActiveDayKey) {
+                    streak = 1;
+                  } else if (prev.lastActiveDayKey !== today) {
+                    const prevDate = new Date(prev.lastActiveDayKey);
+                    const todayDate = new Date(today);
+                    const diffDays = Math.round((todayDate.getTime() - prevDate.getTime()) / 86_400_000);
+                    streak = diffDays === 1 ? streak + 1 : 1;
                   }
+                  if (streak === 3) xp += 15;
+                  if (streak === 7) xp += 40;
+                  const level = Math.floor(Math.sqrt(xp / 100)) + 1;
 
                   return {
                     ...prev,
                     answered,
                     correct,
+                    xp,
+                    level,
+                    lastActiveDayKey: today,
                     lastQuizDayKey: selected === q.correctIndex ? today : prev.lastQuizDayKey,
                     streakDays: streak,
                     savedMinutes: prev.savedMinutes + (selected === q.correctIndex ? 10 : 0),
                     lastMastery: selected === q.correctIndex ? { title: q.prompt.slice(0, 48), scorePct: 100, at: Date.now() } : prev.lastMastery,
                   };
                 });
+                if (selected !== q.correctIndex && flags.behaviorPenalty && sub.isPremium && shield.premium?.behaviorPenaltyEnabled) {
+                  await setShield((prev) => ({
+                    ...prev,
+                    premium: {
+                      strictMode: prev.premium?.strictMode ?? false,
+                      scheduleBlocking: prev.premium?.scheduleBlocking ?? { enabled: false, startHour: 9, endHour: 18, ranges: [{ startHour: 9, endHour: 18 }] },
+                      unlockDelaySeconds: prev.premium?.unlockDelaySeconds ?? 0,
+                      unlockDelayEnabled: prev.premium?.unlockDelayEnabled ?? false,
+                      behaviorPenaltyEnabled: true,
+                      behaviorPenaltyFullBlock: prev.premium?.behaviorPenaltyFullBlock ?? false,
+                      behaviorPenaltyScore: (prev.premium?.behaviorPenaltyScore ?? 0) + 1,
+                      analyticsEnabled: prev.premium?.analyticsEnabled ?? false,
+                    },
+                  }));
+                }
               }}
-              style={[styles.primaryCta, { opacity: selected == null || loading ? 0.45 : 1 }]}
+              style={[styles.primaryCta, { opacity: loading ? 0.45 : 1 }]}
               left={<Ionicons name="checkmark-circle" size={18} color={colors.obsidian} />}
             />
 
             <View style={styles.secondaryRow}>
               <TouchableOpacity style={styles.secondaryCta} activeOpacity={0.9} onPress={() => void loadQuestion()}>
-                <Text style={[styles.secondaryText, { color: muted }]}>AUTRE QUESTION</Text>
+                <Text style={[styles.secondaryText, { color: muted }]}>{t('session.anotherQuestion')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.secondaryCta} activeOpacity={0.9} onPress={() => setRevealed(true)}>
-                <Text style={[styles.secondaryText, { color: muted }]}>AFFICHER</Text>
+                <Text style={[styles.secondaryText, { color: muted }]}>{t('session.reveal')}</Text>
               </TouchableOpacity>
             </View>
 
@@ -230,9 +319,8 @@ export default function FocusSessionScreen() {
               <View style={[styles.result, { backgroundColor: cardBg }]}>
                 <Ionicons name={isCorrect ? 'checkmark-circle' : 'close-circle'} size={18} color={isCorrect ? '#10B981' : '#F87171'} />
                 <Text style={[styles.resultText, { color: colors.text }]}>
-                  {isCorrect
-                    ? 'Bravo ! Vous avez gagné 10 minutes d’accès.'
-                    : 'Dommage. Retentez une autre question ou fermez l’application.'}
+                  {isCorrect ? t('session.correct') : t('session.wrong')}{' '}
+                  {(isCorrect ? positiveMicroTexts : retryMicroTexts)[Math.floor(Math.random() * 3)]}
                 </Text>
               </View>
             ) : null}
@@ -243,7 +331,7 @@ export default function FocusSessionScreen() {
               </View>
             ) : null}
           </Container>
-        </ScrollView>
+        </ScrollView> : null}
       </SafeAreaView>
     </View>
   );
@@ -287,7 +375,22 @@ const styles = StyleSheet.create({
     gap: 10,
     alignItems: 'flex-start',
   },
+  gateCard: {
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    gap: 8,
+  },
   alertText: { flex: 1, fontSize: 12.5, lineHeight: 18, fontWeight: '700' },
+  gateMotivation: { fontSize: 12.5, lineHeight: 18, fontWeight: '600' },
+  gateTease: { fontSize: 11.5, lineHeight: 17, fontWeight: '700' },
+  gateActions: { marginTop: 4, flexDirection: 'row', gap: 8 },
+  gateBtnPrimary: { flex: 1, borderRadius: 12, paddingVertical: 10, alignItems: 'center' },
+  gateBtnPrimaryText: { color: '#F8FAFC', fontSize: 12, fontWeight: '900' },
+  gateBtnSecondary: { flex: 1, borderRadius: 12, paddingVertical: 10, alignItems: 'center' },
+  gateBtnSecondaryText: { fontSize: 12, fontWeight: '900' },
+  delayDoneBtn: { borderRadius: 12, paddingVertical: 10, alignItems: 'center', marginBottom: 8 },
+  delayDoneText: { fontSize: 12, fontWeight: '900' },
 
   content: { paddingTop: 16 },
   kickerRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },

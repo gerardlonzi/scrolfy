@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "FocusScreen",
-    "slug": "FocusScreen",
+    "name": "Scrolfy",
+    "slug": "Scrolfy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "focusscreen",
+    "scheme": "scrolfy",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
@@ -32,7 +32,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.scrolfy.app"
     },
     "web": {
       "output": "static",
@@ -57,6 +58,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "93eee3e8-35c1-41f4-8628-91c7618617d4"
+      }
     }
   }
 }

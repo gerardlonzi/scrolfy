@@ -3,6 +3,7 @@ import type { AppProfile, ShieldConfig, Stats, Subscription, WatchedApp } from '
 export const DEFAULT_PROFILE: AppProfile = {
   completedOnboarding: false,
   situation: 'student',
+  purpose: 'reduce_distractions',
   level: 'Doctorat',
   subject: 'Philosophie',
   proTopics: [],
@@ -13,7 +14,14 @@ export const DEFAULT_SUBSCRIPTION: Subscription = {
   isPremium: false,
 };
 
-export const DEFAULT_APPS: WatchedApp[] = [
+const premiumAppIds = new Set(
+  String(process.env.EXPO_PUBLIC_PREMIUM_APP_IDS ?? '')
+    .split(',')
+    .map((v) => v.trim().toLowerCase())
+    .filter(Boolean),
+);
+
+const appCatalog: Array<Omit<WatchedApp, 'premium'>> = [
   { id: 'instagram', name: 'Instagram', category: 'Réseau Social', scheme: 'instagram://' },
   { id: 'facebook', name: 'Facebook', category: 'Réseau Social', scheme: 'fb://' },
   { id: 'telegram', name: 'Telegram', category: 'Messagerie', scheme: 'tg://' },
@@ -22,8 +30,14 @@ export const DEFAULT_APPS: WatchedApp[] = [
   { id: 'x', name: 'X (Twitter)', category: 'Actualités', scheme: 'twitter://' },
   { id: 'reddit', name: 'Reddit', category: 'Communautés', scheme: 'reddit://' },
   { id: 'youtube', name: 'YouTube', category: 'Divertissement', scheme: 'youtube://' },
-  { id: 'tiktok', name: 'TikTok', category: 'Vidéo', premium: true, scheme: 'tiktok://' },
+  { id: 'tiktok', name: 'TikTok', category: 'Vidéo', scheme: 'tiktok://' },
+  { id: 'chrome', name: 'Chrome', category: 'Navigateur', scheme: 'googlechrome://' },
 ];
+
+export const DEFAULT_APPS: WatchedApp[] = appCatalog.map((app) => ({
+  ...app,
+  premium: premiumAppIds.has(app.id.toLowerCase()),
+}));
 
 export const DEFAULT_SHIELD: ShieldConfig = {
   enabled: false,
@@ -42,6 +56,16 @@ export const DEFAULT_SHIELD: ShieldConfig = {
     overlayAcknowledged: false,
     accessibilityGuided: false,
   },
+  premium: {
+    strictMode: false,
+    scheduleBlocking: { enabled: false, startHour: 9, endHour: 18, ranges: [{ startHour: 9, endHour: 18 }] },
+    unlockDelaySeconds: 0,
+    unlockDelayEnabled: false,
+    behaviorPenaltyEnabled: false,
+    behaviorPenaltyFullBlock: false,
+    behaviorPenaltyScore: 0,
+    analyticsEnabled: false,
+  },
 };
 
 export const DEFAULT_STATS: Stats = {
@@ -49,6 +73,8 @@ export const DEFAULT_STATS: Stats = {
   streakDays: 0,
   answered: 0,
   correct: 0,
+  xp: 0,
+  level: 1,
   askedQuestionIds: [],
 };
 

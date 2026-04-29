@@ -1,16 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -45,8 +42,9 @@ export default function ProfileSetupScreen() {
   const { value: profile, setValue: setProfile, ready } = useStoredState<AppProfile>(KEYS.profile, DEFAULT_PROFILE);
   const { value: shield, setValue: setShield } = useStoredState<ShieldConfig>(KEYS.shield, DEFAULT_SHIELD);
 
-  const [query, setQuery] = useState(profile.subject ?? 'Philosophie');
-  const [selectedSubject, setSelectedSubject] = useState(profile.subject ?? 'Philosophie');
+  const [selectedSubject, setSelectedSubject] = useState(profile.subject ?? STUDENT_SUBJECTS[0]);
+  const [purposeOpen, setPurposeOpen] = useState(false);
+  const [subjectOpen, setSubjectOpen] = useState(false);
   const didInitInputs = useRef(false);
   const permissionsComplete = useMemo(() => {
     const p = shield.permissions ?? {};
@@ -59,18 +57,10 @@ export default function ProfileSetupScreen() {
     if (!ready) return;
     if (didInitInputs.current) return;
     didInitInputs.current = true;
-    setQuery(profile.subject ?? '');
-    setSelectedSubject(profile.subject ?? 'Philosophie');
+    setSelectedSubject(profile.subject ?? STUDENT_SUBJECTS[0]);
   }, [ready, profile.subject, profile.customGoal, profile.proTopics]);
 
-  const subjectSuggestions = useMemo(() => {
-    const q = (query ?? '').trim().toLowerCase();
-    if (!q) return STUDENT_SUBJECTS.slice(0, 6);
-    return STUDENT_SUBJECTS.filter((s) => s.toLowerCase().includes(q));
-  }, [query]);
-
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
         <HeaderBar title={t('setup.profile_title')} showSettings={!isEditFlow} />
@@ -109,52 +99,63 @@ export default function ProfileSetupScreen() {
 
             <SurfaceCard>
                   <Text style={[styles.fieldLabel, { color: colors.onSurfaceVariant }]}>{t('setup.purpose.selectOne')}</Text>
-                  <View style={styles.suggestions}>
-                    {PURPOSES.map((purpose) => (
-                      <TouchableOpacity
-                        key={purpose.id}
-                        style={[
-                          styles.suggestion,
-                          { backgroundColor: profile.purpose === purpose.id ? colors.secondary : colors.surface },
-                        ]}
-                        onPress={() => void setProfile((p) => ({ ...p, situation: 'student', purpose: purpose.id }))}
-                      >
-                        <Text style={[styles.suggestionText, { color: profile.purpose === purpose.id ? colors.obsidian : colors.text }]}>
-                          {t(purpose.label)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
+                  <View style={styles.dropdownWrap}>
+                    <TouchableOpacity
+                      style={[styles.select, { backgroundColor: colors.surface }]}
+                      onPress={() => {
+                        setPurposeOpen((v) => !v);
+                        setSubjectOpen(false);
+                      }}
+                    >
+                      <Text style={[styles.selectText, { color: colors.text }]}>{t(PURPOSES.find((p) => p.id === profile.purpose)?.label ?? PURPOSES[0].label)}</Text>
+                      <Ionicons name={purposeOpen ? 'chevron-up' : 'chevron-down'} size={16} color={colors.onSurfaceVariant} />
+                    </TouchableOpacity>
+                    {purposeOpen ? (
+                      <View style={[styles.dropdownList, { backgroundColor: colors.surfaceContainerLow }]}>
+                        {PURPOSES.map((purpose) => (
+                          <TouchableOpacity
+                            key={purpose.id}
+                            style={[styles.dropdownItem, { backgroundColor: colors.surface }]}
+                            onPress={() => {
+                              void setProfile((p) => ({ ...p, situation: 'student', purpose: purpose.id }));
+                              setPurposeOpen(false);
+                            }}
+                          >
+                            <Text style={[styles.dropdownText, { color: colors.text }]}>{t(purpose.label)}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    ) : null}
                   </View>
                   <View style={{ height: s.md }} />
                   <Text style={[styles.fieldLabel, { color: colors.onSurfaceVariant }]}>{t('setup.subject.title')}</Text>
-                  <View style={[styles.inputRow, { backgroundColor: colors.surface }]}>
-                    <TextInput
-                      value={query}
-                      onChangeText={setQuery}
-                      placeholder={t('setup.subject.searchPlaceholder')}
-                      placeholderTextColor={colors.onSurfaceVariant}
-                      style={[styles.input, { color: colors.text }]}
-                      autoCorrect={false}
-                      autoCapitalize="none"
-                      returnKeyType="done"
-                      blurOnSubmit
-                    />
-                    <Ionicons name="search" size={18} color={colors.onSurfaceVariant} />
-                  </View>
-                  <View style={{ height: s.sm }} />
-                  <View style={styles.suggestions}>
-                    {subjectSuggestions.slice(0, 6).map((subj) => (
-                      <TouchableOpacity
-                        key={subj}
-                        style={[styles.suggestion, { backgroundColor: colors.surface }]}
-                        onPress={() => {
-                          setQuery(subj);
-                          setSelectedSubject(subj);
-                        }}
-                      >
-                        <Text style={[styles.suggestionText, { color: colors.text }]}>{subj}</Text>
-                      </TouchableOpacity>
-                    ))}
+                  <View style={styles.dropdownWrap}>
+                    <TouchableOpacity
+                      style={[styles.select, { backgroundColor: colors.surface }]}
+                      onPress={() => {
+                        setSubjectOpen((v) => !v);
+                        setPurposeOpen(false);
+                      }}
+                    >
+                      <Text style={[styles.selectText, { color: colors.text }]}>{selectedSubject}</Text>
+                      <Ionicons name={subjectOpen ? 'chevron-up' : 'chevron-down'} size={16} color={colors.onSurfaceVariant} />
+                    </TouchableOpacity>
+                    {subjectOpen ? (
+                      <View style={[styles.dropdownList, { backgroundColor: colors.surfaceContainerLow }]}>
+                        {STUDENT_SUBJECTS.map((subj) => (
+                          <TouchableOpacity
+                            key={subj}
+                            style={[styles.dropdownItem, { backgroundColor: colors.surface }]}
+                            onPress={() => {
+                              setSelectedSubject(subj);
+                              setSubjectOpen(false);
+                            }}
+                          >
+                            <Text style={[styles.dropdownText, { color: colors.text }]}>{subj}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    ) : null}
                   </View>
             </SurfaceCard>
 
@@ -200,7 +201,6 @@ export default function ProfileSetupScreen() {
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
-    </TouchableWithoutFeedback>
   );
 
   function SurfaceCard({ children }: { children: React.ReactNode }) {
@@ -242,12 +242,13 @@ const styles = StyleSheet.create({
   select: { height: 46, borderRadius: 16, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   selectText: { fontSize: 14, fontWeight: '700' },
 
-  inputRow: { height: 46, borderRadius: 16, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  input: { flex: 1, fontSize: 14, fontWeight: '600' },
-
   suggestions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   suggestion: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14 },
   suggestionText: { fontSize: 13, fontWeight: '700' },
+  dropdownWrap: { position: 'relative', zIndex: 20 },
+  dropdownList: { position: 'absolute', top: 52, left: 0, right: 0, gap: 8, maxHeight: 220, borderRadius: 14, padding: 8, zIndex: 30 },
+  dropdownItem: { borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10 },
+  dropdownText: { fontSize: 13.5, fontWeight: '700' },
 
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   chip: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14 },

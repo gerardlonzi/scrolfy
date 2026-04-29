@@ -1,6 +1,7 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Localization from 'expo-localization';
 import { useTheme } from '../../constants/themeContext';
 import Container from '../../components/ui/container';
 import GradientButton from '../../components/ui/GradientButton';
@@ -10,45 +11,66 @@ import { useStoredState } from '../../lib/useStored';
 import { KEYS } from '../../lib/keys';
 import { DEFAULT_SUBSCRIPTION } from '../../lib/defaults';
 import type { Subscription } from '../../lib/appModel';
+import { useTranslation } from 'react-i18next';
 
 export default function PaywallScreen() {
   const theme = useTheme();
   const colors = theme.colors;
   const s = theme.spacing;
   const router = useRouter();
+  const { t } = useTranslation();
   const { value: sub, setValue: setSub } = useStoredState<Subscription>(KEYS.subscription, DEFAULT_SUBSCRIPTION);
+  const country = Localization.getLocales()[0]?.regionCode ?? 'FR';
+  const currency = String(process.env.DEFAULT_CURRENCY ?? 'EUR');
+  const monthly = Number(process.env.PREMIUM_MONTHLY_PRICE ?? 4.99);
+  const yearly = Number(process.env.PREMIUM_YEARLY_PRICE ?? 39.99);
+  const formatPrice = (value: number) =>
+    new Intl.NumberFormat(country === 'FR' ? 'fr-FR' : 'en-GB', { style: 'currency', currency }).format(value);
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
         <HeaderBar title="Scrolfy Premium" showSettings={false} />
 
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: s.xl }}>
         <Container paddingX="lg" style={styles.content}>
-          <Text style={[styles.title, { color: colors.text }]}>Libérez votre focus.</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{t('paywall.title')}</Text>
           <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
-            Atteignez vos objectifs avec la méthode Obsidian. Transformez votre distraction en productivité pure avec nos outils d’élite.
+            {t('paywall.subtitle')}
           </Text>
 
           <View style={{ height: s.xl }} />
 
           <View style={[styles.tableCard, { backgroundColor: colors.surfaceContainerLow }]}>
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableTitle, { color: colors.onSurfaceVariant }]}>FONCTIONNALITÉS</Text>
-              <Text style={[styles.tableCol, { color: colors.onSurfaceVariant }]}>GRATUIT</Text>
-              <Text style={[styles.tableCol, { color: colors.onSurfaceVariant }]}>PREMIUM</Text>
+              <Text style={[styles.tableTitle, { color: colors.onSurfaceVariant }]}>{t('paywall.features')}</Text>
+              <Text style={[styles.tableCol, { color: colors.onSurfaceVariant }]}>{t('paywall.free')}</Text>
+              <Text style={[styles.tableCol, { color: colors.onSurfaceVariant }]}>{t('paywall.premium')}</Text>
             </View>
 
-            <FeatureRow name="Apps bloquées" free="1" premium="✓" />
-            <FeatureRow name="IA Omnisciente" free="—" premium="✓" />
-            <FeatureRow name="Mode Offline" free="—" premium="✓" />
-            <FeatureRow name="Sujets personnalisés" free="Basique" premium="✓" />
+            <FeatureRow name={t('paywall.rows.upTo3Apps')} free="✓" premium="✓" />
+            <FeatureRow name={t('paywall.rows.simpleDailyLimit')} free="✓" premium="✓" />
+            <FeatureRow name={t('paywall.rows.unlimitedApps')} free="—" premium="✓" />
+            <FeatureRow name={t('paywall.rows.strictMode')} free="—" premium="✓" />
+            <FeatureRow name={t('paywall.rows.scheduleBlocking')} free="—" premium="✓" />
+            <FeatureRow name={t('paywall.rows.unlockDelay')} free="—" premium="✓" />
+            <FeatureRow name={t('paywall.rows.behaviorPenalty')} free="—" premium="✓" />
+            <FeatureRow name={t('paywall.rows.advancedAnalytics')} free="Basic" premium="✓" />
           </View>
 
           <View style={{ height: s.xl }} />
 
+          <View style={styles.socialProofWrap}>
+            <View style={styles.avatars}>
+              <View style={[styles.avatar, { backgroundColor: '#F59E0B' }]} />
+              <View style={[styles.avatar, { backgroundColor: '#3B82F6', marginLeft: -10 }]} />
+              <View style={[styles.avatar, { backgroundColor: '#10B981', marginLeft: -10 }]} />
+            </View>
+            <Text style={[styles.socialProofText, { color: colors.onSurfaceVariant }]}>{t('paywall.socialProof')}</Text>
+          </View>
           <GradientButton
             variant="premium"
-            title="Commencer l’essai gratuit de 3 jours"
+            title={t('paywall.ctaTrial')}
             onPress={() => {}}
             style={styles.primaryCta}
             left={<Ionicons name="sparkles" size={16} color={colors.cloud} />}
@@ -63,8 +85,10 @@ export default function PaywallScreen() {
             </Text>
           </TouchableOpacity>
 
-          <Text style={[styles.price, { color: colors.onSurfaceVariant }]}>Puis 9,99€/mois</Text>
-          <Text style={[styles.cancel, { color: colors.onSurfaceVariant }]}>Annulable à tout moment</Text>
+          <Text style={[styles.price, { color: colors.onSurfaceVariant }]}>
+            {formatPrice(monthly)} / month · {formatPrice(yearly)} / year
+          </Text>
+          <Text style={[styles.cancel, { color: colors.onSurfaceVariant }]}>{t('paywall.hint')}</Text>
 
           <View style={{ height: s.md }} />
 
@@ -74,6 +98,7 @@ export default function PaywallScreen() {
             <Text style={[styles.footerLink, { color: colors.onSurfaceVariant }]}>Aide</Text>
           </View>
         </Container>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -114,5 +139,9 @@ const styles = StyleSheet.create({
 
   footerRow: { marginTop: 18, flexDirection: 'row', justifyContent: 'space-between' },
   footerLink: { fontSize: 11, fontWeight: '800' },
+  socialProofWrap: { marginBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  avatars: { flexDirection: 'row', alignItems: 'center' },
+  avatar: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: '#fff' },
+  socialProofText: { fontSize: 12, fontWeight: '700' },
 });
 

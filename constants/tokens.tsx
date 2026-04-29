@@ -11,6 +11,8 @@ export const TOKENS = {
       onSurface: '#0F172A',
       primary: '#0F172A',
       secondary: '#10B981',
+      danger:'#7F1D1D',
+
 
       // Primary button gradient (design system)
       primaryGradientStart: '#4EDEA3',

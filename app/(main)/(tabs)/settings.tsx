@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import {
+  Alert,
   Linking,
   SafeAreaView,
   ScrollView,
@@ -20,6 +21,8 @@ import { useStoredState } from '../../../lib/useStored';
 import { DEFAULT_PROFILE, DEFAULT_SHIELD, DEFAULT_SUBSCRIPTION } from '../../../lib/defaults';
 import type { AppProfile, ShieldConfig, Subscription } from '../../../lib/appModel';
 import i18n from '../../../i18n/i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { premiumFeatureFlags } from '../../../lib/featureFlags';
 
 export default function SettingsTab() {
   const theme = useTheme();
@@ -47,6 +50,30 @@ export default function SettingsTab() {
     const order: ThemePreference[] = ['light', 'dark', 'system'];
     const next = order[(order.indexOf(theme.themePreference) + 1) % order.length];
     await theme.setThemePreference(next);
+  };
+
+  const clearAll = async () => {
+    Alert.alert(t('settings.resetData'), t('settings.resetDataConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('settings.delete'),
+        style: 'destructive',
+        onPress: async () => {
+          await AsyncStorage.clear();
+        },
+      },
+    ]);
+  };
+  const flags = premiumFeatureFlags();
+  const scheduleIsPremium = flags.scheduleBlocking;
+  const unlockDelayIsPremium = flags.unlockDelay;
+  const behaviorPenaltyIsPremium = flags.behaviorPenalty;
+
+  const showPremiumModal = () => {
+    Alert.alert(t('premiumModal.title'), t('premiumModal.body'), [
+      { text: t('premiumModal.continueFree'), style: 'cancel' },
+      { text: t('premiumModal.tryPremium'), onPress: () => router.push('/(main)/paywall') },
+    ]);
   };
 
   return (
@@ -106,8 +133,64 @@ export default function SettingsTab() {
             <RowButton
               icon="time-outline"
               title={t('settings.limits')}
-              subtitle={`${shield.limits.sessionMaxMinutes}′ / session · ${shield.limits.dailyMaxMinutes}′ / jour`}
+              subtitle={t('settings.limitsSummary', {
+                session: shield.limits.sessionMaxMinutes,
+                daily: shield.limits.dailyMaxMinutes,
+              })}
               onPress={() => router.push('/(main)/limits')}
+            />
+
+            <View style={{ height: s.sm }} />
+
+            <Text style={[styles.section, { color: colors.onSurfaceVariant }]}>{t('settings.focusControl')}</Text>
+
+            <RowButton
+              icon="calendar-outline"
+              title={t('settings.focusSchedule')}
+              subtitle={scheduleIsPremium && !sub.isPremium ? t('common.premiumLocked') : t('settings.enabled')}
+              onPress={() => {
+                if (scheduleIsPremium && !sub.isPremium) {
+                  showPremiumModal();
+                  return;
+                }
+                router.push('/(main)/schedule-blocking');
+              }}
+            />
+
+            <View style={{ height: s.sm }} />
+
+            <RowButton
+              icon="hourglass-outline"
+              title={t('settings.focusUnlockDelay')}
+              subtitle={
+                unlockDelayIsPremium && !sub.isPremium
+                  ? t('common.premiumLocked')
+                  : sub.isPremium
+                  ? t('settings.focusUnlockDelayHint', { n: shield.premium?.unlockDelaySeconds ?? 0 })
+                  : t('settings.enabled')
+              }
+              onPress={() => {
+                if (unlockDelayIsPremium && !sub.isPremium) {
+                  showPremiumModal();
+                  return;
+                }
+                router.push('/(main)/unlock-delay');
+              }}
+            />
+
+            <View style={{ height: s.sm }} />
+
+            <RowButton
+              icon="warning-outline"
+              title={t('settings.focusBehaviorPenalty')}
+              subtitle={behaviorPenaltyIsPremium && !sub.isPremium ? t('common.premiumLocked') : t('settings.enabled')}
+              onPress={() => {
+                if (behaviorPenaltyIsPremium && !sub.isPremium) {
+                  showPremiumModal();
+                  return;
+                }
+                router.push('/(main)/behavior-penalty');
+              }}
             />
 
             <View style={{ height: s.sm }} />
@@ -124,7 +207,7 @@ export default function SettingsTab() {
             <RowButton
               icon="shield-checkmark-outline"
               title={t('settings.quizDemo')}
-              subtitle="Session quiz"
+              subtitle={t('settings.quizDemoHint')}
               onPress={() => router.push('/(main)/focus-session?source=demo')}
             />
 
@@ -136,6 +219,42 @@ export default function SettingsTab() {
               subtitle={t('settings.permissionsHint')}
               onPress={() => void Linking.openSettings()}
             />
+
+            <RowButton
+              icon="document-text-outline"
+              title={t('settings.privacyPolicy')}
+              subtitle={t('settings.privacyPolicyHint')}
+              onPress={() => router.push('/privacy-policy' as never)}
+            />
+            <View style={{ height: s.sm }} />
+            <RowButton
+              icon="document-outline"
+              title={t('settings.terms')}
+              subtitle={t('settings.termsHint')}
+              onPress={() => router.push('/terms-conditions' as never)}
+            />
+            <View style={{ height: s.sm }} />
+            <View style={[styles.card, { backgroundColor: colors.surfaceContainerLow }]}>
+              <Text style={[styles.rowTitle, { color: colors.text }]}>{t('settings.contact')}</Text>
+              <Text style={[styles.rowSub, { color: colors.onSurfaceVariant }]}>
+                {String(process.env.EXPO_PUBLIC_CONTACT_NAME ?? '')}
+              </Text>
+              <Text style={[styles.rowSub, { color: colors.onSurfaceVariant }]}>
+                {String(process.env.EXPO_PUBLIC_CONTACT_EMAIL ?? '')}
+              </Text>
+              <Text style={[styles.rowSub, { color: colors.onSurfaceVariant }]}>
+                {String(process.env.EXPO_PUBLIC_CONTACT_PHONE ?? '')}
+              </Text>
+              <Text style={[styles.rowSub, { color: colors.onSurfaceVariant }]}>
+                {String(process.env.EXPO_PUBLIC_CONTACT_LINKEDIN ?? '')}
+              </Text>
+            </View>
+            <View style={{ height: s.sm }} />
+            <TouchableOpacity style={[styles.btn, { backgroundColor: colors.danger }]} onPress={clearAll}>
+                <Ionicons name="trash" size={18} color={colors.cloud} />
+                <Text style={[styles.btnText, { color: colors.cloud }]}>{t('settings.resetData')}</Text>
+            </TouchableOpacity>
+            
           </Container>
         </ScrollView>
       </SafeAreaView>

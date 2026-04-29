@@ -33,6 +33,7 @@ const defaultTheme: Theme = {
     onSurfaceVariant: '#45464D',
     surfaceContainerLow: TOKENS.colors.surfaceContainerLow,
     cloud: TOKENS.colors.cloud,
+    danger:TOKENS.colors.danger
   },
 };
 

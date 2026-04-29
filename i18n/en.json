@@ -56,7 +56,8 @@
     "dailyLimit": "⏱ Daily limit (free)",
     "schedule": "📅 Schedule",
     "strictMode": "🔒 Strict mode",
-    "customLimit": "Custom"
+    "customLimit": "Custom",
+    "custom": "Custom"
   },
 
   "mastery": {
@@ -106,7 +107,11 @@
     "focusUnlockDelayHint": "{{n}}s",
     "focusUnlockDelayPick": "Choose a delay",
     "focusBehaviorPenalty": "Behavioral penalty",
-    "enabled": "Enabled"
+    "enabled": "Enabled",
+    "addRange": "Add schedule range",
+    "disable": "Disable",
+    "fullBlock": "Full block on failed quiz",
+    "penaltyScore": "Penalty score: {{n}}"
   },
   "session": {
     "title": "Interception",
@@ -131,7 +136,9 @@
     "upgrade": "Upgrade to Premium",
     "startQuiz": "Start quiz",
     "unlockDelayCountdown": "Starting in {{s}}s",
-    "premiumTease": "Premium adds unlock delay and behavioral penalty system."
+    "premiumTease": "Premium adds unlock delay and behavioral penalty system.",
+    "doneTitle": "Questions completed",
+    "doneBody": "You have answered all available questions for now."
   },
 
   "splash": {
